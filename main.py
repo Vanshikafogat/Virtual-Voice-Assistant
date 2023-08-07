@@ -13,7 +13,7 @@ def text_to_speech(text):
 
 def recognize_text():
     recognize_user_text = speech.Recognizer()
-    with speech.Microphone as source:
+    with speech.Microphone() as source:
         print("Listening to the Instruction...")
         recognize_user_text.adjust_for_ambient_noise(source)
         audio_instruction = recognize_user_text.listen(source)
@@ -64,4 +64,50 @@ def create_to_do_list():
             text_to_speech(f"{index}.{task}")
 
 
+def perform_search(query):
+    api_key = "AIzaSyBIXxHTSQLsbwJMkdgtkpkjHAkjcA-iTfg"
+    search_engine_id = "16a46851ef7c84852"
+    url = f'https://www.googleapis.com/customsearch/v1'
+    params = {
+        'key' : api_key,
+        'cx' : search_engine_id,
+        'q' : query,
+        'num' : 3
+    }
 
+    try :
+        response = requests.get(url, params=params)
+        data = response.json()
+        if 'items' in data:
+            text_to_speech("Here are some search results:")
+            for index,item in enumerate(data['items'],1):
+                text_to_speech(f"{index} {item['title']}")
+                text_to_speech(item['snippet'])
+        else:
+            text_to_speech("Sorry, I couldn't find out relevant search results.")
+    except requests.RequestException as err:
+        text_to_speech("Sorry, there was ana error in performing the search")
+
+def main():
+    text_to_speech("Hello! How can I assist you?")
+    while True:
+        command = recognize_text().lower()
+        if "reminder" in command:
+            to_set_reminder()
+        elif "list" in command:
+            create_to_do_list()
+        elif "search" in command:
+            query = command.replace("search", "").strip()
+            if query:
+                perform_search(query)
+            else:
+                text_to_speech("Please mention what would you like to search for?")
+        elif "exit" in command:
+            text_to_speech("Goodbye!")
+            break
+        else:
+            text_to_speech("Sorry! I couldn't recognize that, Please try again")
+
+
+if __name__=="__main__":
+    main()
