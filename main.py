@@ -2,6 +2,7 @@ import speech_recognition as speech
 import pyttsx3
 import datetime
 import requests
+import os
 
 converter = pyttsx3.init()
 
@@ -65,8 +66,8 @@ def create_to_do_list():
 
 
 def perform_search(query):
-    api_key = "AIzaSyBIXxHTSQLsbwJMkdgtkpkjHAkjcA-iTfg"
-    search_engine_id = "16a46851ef7c84852"
+    api_key = os.environ.get('API_KEY')
+    search_engine_id = os.environ.get('SEARCH_ENGINE_ID')
     url = f'https://www.googleapis.com/customsearch/v1'
     params = {
         'key' : api_key,
